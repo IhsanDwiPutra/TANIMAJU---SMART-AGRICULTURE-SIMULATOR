@@ -70,6 +70,13 @@ public class FarmingPlot : MonoBehaviour
     {
         if (currentState == PlotState.Planted && isMaxGrown)
         {
+            // Panggil EconomyManager untuk menambah uang berdasarkan harga jual tanaman
+            if (currentCropData != null)
+            {
+                EconomyManager.Instance.AddMoney(currentCropData.sellPrice);
+            }
+
+            // Reset status petak tanah kembali ke awal
             currentState = PlotState.Empty;
             currentCropData = null;
             growthTimer = 0f;

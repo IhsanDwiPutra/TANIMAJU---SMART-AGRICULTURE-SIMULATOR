@@ -843,8 +843,8 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: TANIMAJU - SMART AGRICULTURE SIMULATOR
-  metroPackageVersion: 
+  metroPackageName: TANIMAJU-SMARTAGRICULTURESIMULATOR
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -852,7 +852,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: TANIMAJU - SMART AGRICULTURE SIMULATOR
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: TANIMAJU - SMART AGRICULTURE SIMULATOR
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
@@ -919,7 +919,7 @@ PlayerSettings:
   qnxGraphicConfPath: 
   apiCompatibilityLevel: 6
   captureStartupLogs: {}
-  activeInputHandler: 1
+  activeInputHandler: 2
   windowsGamepadBackendHint: 0
   cloudProjectId: 30d45094-f8b4-440d-84c4-678b33aaeaed
   framebufferDepthMemorylessMode: 0
