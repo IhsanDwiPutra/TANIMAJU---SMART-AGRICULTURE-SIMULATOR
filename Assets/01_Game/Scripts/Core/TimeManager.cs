@@ -1,7 +1,10 @@
 using UnityEngine;
+using System;
 
 public class TimeManager : MonoBehaviour
 {
+    public static event Action OnHourChanged; // Event penanda jam berubah
+
     public float timeSpeed = 60f; // Kecepatan waktu virtual
     private float currentSecond;
     public int currentHour = 6; // Mulai game jam 6 pagi
@@ -11,12 +14,21 @@ public class TimeManager : MonoBehaviour
     {
         // Menghitung detik virtual berdasarkan waktu nyata
         currentSecond += Time.deltaTime * timeSpeed;
+        UIManager.Instance.UpdateTimeGUI(currentDay, currentHour);
 
         if (currentSecond >= 60f)
         {
             currentSecond = 0;
             currentHour++;
             Debug.Log("Jam Virtual saat ini:" + currentHour + ":00");
+
+            // Picu event OnHourChanged agar semua petak tanah tahu jam sudah berganti
+            OnHourChanged.Invoke();
+
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.UpdateTimeGUI(currentDay, currentHour);
+            }
 
             if (currentHour >= 24)
             {

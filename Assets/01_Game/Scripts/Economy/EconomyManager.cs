@@ -24,7 +24,7 @@ public class EconomyManager : MonoBehaviour
     public void AddMoney(int amount)
     {
         currentMoney += amount;
-        Debug.Log("Uang bertambah! Total Dompet saat ini: " + currentMoney + " Koin");
+        UIManager.Instance.UpdateMoneyUI(currentMoney);
     }
 
     // Fungsi untuk mengurangi uang (saat beli benih atau alat IoT)
@@ -33,7 +33,7 @@ public class EconomyManager : MonoBehaviour
         if (currentMoney >= amount)
         {
             currentMoney -= amount;
-            Debug.Log("Uang berkurang! Total Dompet saat ini: " + currentMoney + " Koin");
+            UIManager.Instance.UpdateMoneyUI(currentMoney);
             return true; // Transaksi sukses
         }
         else

@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     // Kita buat sistem sederhana untuk memilih alat apa yang lagi dipegang pemain
-    public enum ActiveTool { Hoe, Seed, Hand }
+    public enum ActiveTool { Hoe, Seed, Hand, WaterCan, Sprinkler }
     [Header("Tools Settings")]
     public ActiveTool currentTool = ActiveTool.Hoe;
 
@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1)) { currentTool = ActiveTool.Hoe; Debug.Log("Alat aktif: Cangkul (Hoe)"); }
         if (Input.GetKeyDown(KeyCode.Alpha2)) { currentTool = ActiveTool.Seed; Debug.Log("Alat aktif: Benih (Seed)"); }
         if (Input.GetKeyDown(KeyCode.Alpha3)) { currentTool = ActiveTool.Hand; Debug.Log("Alat aktif: Tangan Kosong (Hand)"); }
+        if (Input.GetKeyDown(KeyCode.Alpha4)) { currentTool = ActiveTool.WaterCan; Debug.Log("Alat aktif: Gembor Air (WaterCan)");}
+        if (Input.GetKeyDown(KeyCode.Alpha5)) { currentTool = ActiveTool.Sprinkler; Debug.Log("Alat aktif: Pasang Smart Sprinkler IoT");}
     }
 
     void HandleFarmingInput()
@@ -59,6 +61,20 @@ public class PlayerController : MonoBehaviour
                     case ActiveTool.Hand:
                         targetPlot.HarvestPlot(); // Panggil fungsi panen
                         Debug.Log("Lagi panen bang");
+                        break;
+                    
+                    case ActiveTool.WaterCan:
+                        targetPlot.WaterPlot(); // Siram manual
+                        Debug.Log("Tanah berhasil disiram manual!");
+                        break;
+                    
+                    case ActiveTool.Sprinkler:
+                        // Biar realistis, pasang sprinkler butuh modal. Misal harga pasang 500 koin
+                        if (EconomyManager.Instance.RemoveMoney(500))
+                        {
+                            targetPlot.EquipSmartSprinkler(); // Pasang alat IoT otomatis
+                            Debug.Log("Pasang alat IoT berhasil!");
+                        }
                         break;
                 }
             }

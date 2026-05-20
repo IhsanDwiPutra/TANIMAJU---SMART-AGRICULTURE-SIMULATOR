@@ -6,6 +6,12 @@ public class FarmingPlot : MonoBehaviour
     public enum PlotState { Empty, Tilled, Planted }
     public PlotState currentState = PlotState.Empty;
 
+    [Header("Water & IoT Settings")]
+    public float waterLevel = 100f; // Indikator air (0% - 100%)
+    public float evaporationRate = 5f; // Berapa % air berkurang setiap jam virtual
+    public bool hasSmartSprinkler = false; // Apakah alat IoT otomatus sudah terpasang?
+    public GameObject sprinklerVisual; // Referensi objek 3D sprinkler pintar
+
     [Header("Crop Settings")]
     public CropData currentCropData; // Menyimpan data tanaman yang sedang ditanam
     private float growthTimer = 0f;
@@ -15,6 +21,7 @@ public class FarmingPlot : MonoBehaviour
     public Renderer plotRenderer;
     public Color emptyColor = new Color(0.5f, 0.35f, 0.2f); // Cokelat muda
     public Color tilledColor = new Color(0.3f, 0.2f, 0.1f);  // Cokelat tua (subur)
+    public Color dryColor = new Color(0.7f, 0.55f, 0.4f); // Warna tanah kalau sering kerontang
     
     private GameObject spawnedCropModel;
 
@@ -22,12 +29,29 @@ public class FarmingPlot : MonoBehaviour
     {
         // Set warna awal tanah jadi tanah biasa
         UpdatePlotVisual();
+
+        // Daftarkan fungsi penguapan air ke sistem jam TimeManager
+        TimeManager.OnHourChanged += HandleEvaporation;
+    }
+
+    void OnDestroy()
+    {
+        // Unsubscribe agar tidak menyebabkan memory leak
+        TimeManager.OnHourChanged -= HandleEvaporation;
     }
 
     void Update()
     {
+        // Logika Otomasi IoT Smart Sprinkler
+        if (hasSmartSprinkler && waterLevel < 30f)
+        {
+            WaterPlot(); // Otomatis menyiram kalau air di bawah 30%
+            Debug.Log(gameObject.name + ": [IoT Alert] Sensor mendeteksi tanah kering, Smart Sprinkler otomatis menyiram!");
+        }
+
+
         // Jika ada tanaman yang tertanam dan belum tumbuh maksimal
-        if (currentState == PlotState.Planted && !isMaxGrown)
+        if (currentState == PlotState.Planted && !isMaxGrown && waterLevel > 0)
         {
             growthTimer += Time.deltaTime;
 
@@ -41,12 +65,43 @@ public class FarmingPlot : MonoBehaviour
         }
     }
 
+    // Fungsi yang otomatis dipanggil setiap jam virtual berubah
+    void HandleEvaporation()
+    {
+        if (currentState != PlotState.Empty)
+        {
+            waterLevel -= evaporationRate;
+            if (waterLevel < 0) waterLevel = 0;
+
+            UpdatePlotVisual();
+        }
+    }
+
+    // Fungsi untuk menyiram tanah (bisa dipanggil manual atau lewat IoT)
+    public void WaterPlot()
+    {
+        waterLevel = 100f;
+        UpdatePlotVisual();
+    }
+
+    // Fungsi untuk memasang alat pintar IoT (Beli dari toko)
+    public void EquipSmartSprinkler()
+    {
+        if (!hasSmartSprinkler)
+        {
+            hasSmartSprinkler = true;
+            if (sprinklerVisual != null) sprinklerVisual.SetActive(true); // Munculkan visual alatnya
+            Debug.Log("Smart Sprinkler IoT berhasil dipasang di petak ini!");
+        }
+    }
+
     // Fungsi untuk mencangkul tanah
     public void TillPlot()
     {
         if (currentState == PlotState.Empty)
         {
             currentState = PlotState.Tilled;
+            waterLevel = 100f; // Otomatis basah setelah dicangkul awal
             UpdatePlotVisual();
             Debug.Log("Tanah berhasil dicangkul!");
         }
@@ -92,8 +147,13 @@ public class FarmingPlot : MonoBehaviour
     // Mengubah warna tanah berdasarkan statusnya
     void UpdatePlotVisual()
     {
-        if (currentState == PlotState.Empty) plotRenderer.material.color = emptyColor;
-        else if (currentState == PlotState.Tilled) plotRenderer.material.color = tilledColor;
+        if (waterLevel <= 0) plotRenderer.material.color = dryColor; // Tanah mati/kering
+        else if (currentState == PlotState.Empty) plotRenderer.material.color = emptyColor;
+        else if (currentState == PlotState.Tilled || currentState == PlotState.Planted)
+        {
+            // Semakin kering tanahnya, warnanya bakal memudar dari cokelat tua ke cokelar muda
+            plotRenderer.material.color = Color.Lerp(emptyColor, tilledColor, waterLevel / 100f);
+        }
     }
 
     // Memunculkan aset 3D tumbuhan yang sudah matang
