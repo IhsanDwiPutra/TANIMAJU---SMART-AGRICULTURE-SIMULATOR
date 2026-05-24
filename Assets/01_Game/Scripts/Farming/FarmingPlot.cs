@@ -54,12 +54,40 @@ public class FarmingPlot : MonoBehaviour
         if (currentState == PlotState.Planted && !isMaxGrown && waterLevel > 0)
         {
             growthTimer += Time.deltaTime;
+            float growthPercentage = growthTimer / currentCropData.timeToGrow;
+
+            // Mengatur ukuran model 3D secara bertahap berdasarkan waktu virtual
+            if (spawnedCropModel != null)
+            {
+                // Fase 1: Baru ditanam (0% - 30% progres)
+                if (growthPercentage < 0.3f)
+                {
+                    // Bisa scaling model 3D-nya biar mulai dari ukuran kecil
+                    spawnedCropModel.transform.localScale = Vector3.one * 0.2f;
+                }
+                // Fase 2: Sedang tumbuh (30% - 70% progres)
+                else if (growthPercentage >= 0.3f && growthPercentage < 0.7f)
+                {
+                    // Ukuran model 3D otomatis membesar di layar jadi setengah matang
+                    spawnedCropModel.transform.localScale = Vector3.one * 0.6f;
+                }
+                // Fase 3: Matang (Diatas 70% progres sampai target waktu selesai)
+                else
+                {
+                    spawnedCropModel.transform.localScale = Vector3.one * 1.0f;
+                }
+                
+            }
+
 
             // Cek apakah timer pertumbuhan sudah melewati waktu target di CropData
             if (growthTimer >= currentCropData.timeToGrow)
             {
                 isMaxGrown = true;
-                SpawnFullGrownModel();
+
+                // Saat Matang: Ganti model proses menjadi model matang!
+                SwapToFullGrownModel();
+
                 Debug.Log(currentCropData.cropName + " sudah siap dipanen!");
             }
         }
@@ -117,6 +145,13 @@ public class FarmingPlot : MonoBehaviour
             growthTimer = 0f;
             isMaxGrown = false;
             Debug.Log("Menanam benih: " + crop.cropName);
+
+            // Langsung spawn model di sini: Muncul saat klik tanam dengan ukuran awal yang kecil
+            if (currentCropData.fullGrownModel != null)
+            {
+                spawnedCropModel = Instantiate(currentCropData.fullGrownModel, transform.position + Vector3.up * 0.2f, Quaternion.identity);
+                spawnedCropModel.transform.parent = this.transform;
+            }
         }
     }
 
@@ -163,6 +198,23 @@ public class FarmingPlot : MonoBehaviour
         {
             // Munculkan model 3D tanaman tepat di atas petak tanah
             spawnedCropModel = Instantiate(currentCropData.fullGrownModel, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        }
+    }
+
+    // Fungsi untuk mengahancurkan model lama dan menggantinya dengan model matang
+    void SwapToFullGrownModel()
+    {
+        // Hancurkan dulu model proses tumbuh yang lama
+        if (spawnedCropModel != null)
+        {
+            Destroy(spawnedCropModel);
+        }
+
+        // Spawn model baru yang sudah matang/masak
+        if (currentCropData.fullGrownModel != null)
+        {
+            spawnedCropModel = Instantiate(currentCropData.fullGrownModel, transform.position + Vector3.up * 0.2f, Quaternion.identity);
+            spawnedCropModel.transform.parent = this.transform;
         }
     }
 }

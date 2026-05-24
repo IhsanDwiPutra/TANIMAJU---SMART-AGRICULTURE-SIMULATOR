@@ -7,5 +7,8 @@ public class CropData : ScriptableObject
     public float timeToGrow; // Total waktu yang dibutuhkan sampai panen (dalam detik)
     public int purchasePrice; // Harga beli benih
     public int sellPrice; // Harga jual hasil panen
+
+    // FITUR MODEL TERPISAH
+    public GameObject growingModel;
     public GameObject fullGrownModel; // Aset 3D ketika tanaman sudah siap panen
 }
