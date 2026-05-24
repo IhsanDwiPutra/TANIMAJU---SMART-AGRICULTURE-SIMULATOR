@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     [Header("UI Text References")]
     public TextMeshProUGUI moneyText;
     public TextMeshProUGUI timeText;
+    public TextMeshProUGUI marketBoardText;
 
     void Awake()
     {
@@ -32,6 +33,14 @@ public class UIManager : MonoBehaviour
             // Format jam agar terlihat rapi
             string formattedHour = hour.ToString("00") + ":00";
             timeText.text = "Hari: " + day + " | Jam: " + formattedHour;
+        }
+    }
+
+    public void UpdateMarketBoardUI(int padiPrice, int gandumPrice)
+    {
+        if (marketBoardText != null)
+        {
+            marketBoardText.text = "Market - Padi: " + padiPrice + " | Gandum:" + gandumPrice;
         }
     }
 }

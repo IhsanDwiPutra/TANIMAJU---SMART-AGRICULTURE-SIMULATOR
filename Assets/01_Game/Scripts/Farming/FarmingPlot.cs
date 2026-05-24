@@ -81,7 +81,7 @@ public class FarmingPlot : MonoBehaviour
 
 
             // Cek apakah timer pertumbuhan sudah melewati waktu target di CropData
-            if (growthTimer >= currentCropData.timeToGrow)
+            if (growthTimer >= (currentCropData.timeToGrow * UpgradeManager.Instance.GetGrowthMultiplier()))
             {
                 isMaxGrown = true;
 
@@ -98,7 +98,7 @@ public class FarmingPlot : MonoBehaviour
     {
         if (currentState != PlotState.Empty)
         {
-            waterLevel -= evaporationRate;
+            waterLevel -= UpgradeManager.Instance.GetEvaporationReduction();
             if (waterLevel < 0) waterLevel = 0;
 
             UpdatePlotVisual();
@@ -147,9 +147,9 @@ public class FarmingPlot : MonoBehaviour
             Debug.Log("Menanam benih: " + crop.cropName);
 
             // Langsung spawn model di sini: Muncul saat klik tanam dengan ukuran awal yang kecil
-            if (currentCropData.fullGrownModel != null)
+            if (currentCropData.growingModel != null)
             {
-                spawnedCropModel = Instantiate(currentCropData.fullGrownModel, transform.position + Vector3.up * 0.2f, Quaternion.identity);
+                spawnedCropModel = Instantiate(currentCropData.growingModel, transform.position + Vector3.up * 0.2f, Quaternion.identity);
                 spawnedCropModel.transform.parent = this.transform;
             }
         }

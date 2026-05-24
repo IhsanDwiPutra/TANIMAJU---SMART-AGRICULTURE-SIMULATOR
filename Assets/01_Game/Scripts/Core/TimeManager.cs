@@ -3,12 +3,19 @@ using System;
 
 public class TimeManager : MonoBehaviour
 {
+    public static TimeManager Instance;
     public static event Action OnHourChanged; // Event penanda jam berubah
 
     public float timeSpeed = 60f; // Kecepatan waktu virtual
     private float currentSecond;
     public int currentHour = 6; // Mulai game jam 6 pagi
     public int currentDay = 1;
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
     void Update()
     {
@@ -34,7 +41,18 @@ public class TimeManager : MonoBehaviour
             {
                 currentHour = 0;
                 currentDay ++;
-                Debug.Log("Masuk ke Hari ke-" + currentDay);
+
+                // Acak harga pasar saat hari baru dimulai!
+                if (MarketManager.Instance != null)
+                {
+                    MarketManager.Instance.UpdateMarketPrices();
+                } 
+
+                // Otomatis save progress setiap hari baru dimulai!
+                if (SaveManager.Instance != null)
+                {
+                    SaveManager.Instance.SaveGameProgress();
+                }
             }
         }
     }

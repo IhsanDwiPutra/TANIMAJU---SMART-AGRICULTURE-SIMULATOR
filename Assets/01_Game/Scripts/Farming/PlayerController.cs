@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3)) { currentTool = ActiveTool.Hand; Debug.Log("Alat aktif: Tangan Kosong (Hand)"); }
         if (Input.GetKeyDown(KeyCode.Alpha4)) { currentTool = ActiveTool.WaterCan; Debug.Log("Alat aktif: Gembor Air (WaterCan)");}
         if (Input.GetKeyDown(KeyCode.Alpha5)) { currentTool = ActiveTool.Sprinkler; Debug.Log("Alat aktif: Pasang Smart Sprinkler IoT");}
+        if (Input.GetKeyDown(KeyCode.B)) ShopManager.Instance.ToggleShop();
     }
 
     void HandleFarmingInput()
@@ -50,11 +51,20 @@ public class PlayerController : MonoBehaviour
                     case ActiveTool.Seed:
                         if (seedToPlant != null)
                         {
-                            targetPlot.PlantSeed(seedToPlant); // Panggil fungsi tanam
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Kamu milih alat benih, tapi belum masukin data benihnya di Inspector!");
+                            // Cek dulu: Apakah benihnya ada di kantong inventory?
+                            if (InventoryManager.Instance.GetSeedCount(seedToPlant) > 0)
+                            {
+                                // Jika petak tanah berhasil ditanam (statusnya berubah)
+                                if (targetPlot.currentState == FarmingPlot.PlotState.Tilled)
+                                {
+                                    targetPlot.PlantSeed(seedToPlant);
+                                    InventoryManager.Instance.TryUseSeed(seedToPlant); // Kurangi benihnya di inventory
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogWarning("Gagal menanam! Benih " + seedToPlant.cropName + " kamu habis. Beli dulu di toko!");
+                            }
                         }
                         break;
 

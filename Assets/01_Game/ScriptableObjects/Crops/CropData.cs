@@ -11,4 +11,6 @@ public class CropData : ScriptableObject
     // FITUR MODEL TERPISAH
     public GameObject growingModel;
     public GameObject fullGrownModel; // Aset 3D ketika tanaman sudah siap panen
+
+    public Sprite cropIcon; // Ikon untuk tombol UI
 }
