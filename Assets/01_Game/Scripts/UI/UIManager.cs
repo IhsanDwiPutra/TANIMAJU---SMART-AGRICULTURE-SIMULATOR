@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI moneyText;
     public TextMeshProUGUI timeText;
     public TextMeshProUGUI marketBoardText;
+    public TextMeshProUGUI weatherText;
 
     void Awake()
     {
@@ -41,6 +42,17 @@ public class UIManager : MonoBehaviour
         if (marketBoardText != null)
         {
             marketBoardText.text = "Market - Padi: " + padiPrice + " | Gandum:" + gandumPrice;
+        }
+    }
+
+    public void UpdateWeatherUI(string weatherName)
+    {
+        if (weatherText != null)
+        {
+            // Kasih warna teks biar dramatis sesuai cuaca
+            if (weatherName == "Heatwave") weatherText.text = "Cuaca: <color=red>KEMARAU EKSTREM</color>";
+            else if (weatherName == "Rainy") weatherText.text = "Cuaca: <color=blue>HUJAN DERAS</color>";
+            else weatherText.text = "Cuaca: Cerah";
         }
     }
 }

@@ -98,8 +98,25 @@ public class FarmingPlot : MonoBehaviour
     {
         if (currentState != PlotState.Empty)
         {
-            waterLevel -= UpgradeManager.Instance.GetEvaporationReduction();
-            if (waterLevel < 0) waterLevel = 0;
+            if (WeatherManager.Instance != null)
+            {
+                // Ambil efek cuaca saat ini
+                float weatherMultiplier = WeatherManager.Instance.GetWeatherEvaporationMultiplier();
+
+                if (WeatherManager.Instance.currentWeather == WeatherManager.WeatherType.Rainy)
+                {
+                    // Jika hujan, air malah otomatis bertambah di petak tanah
+                    waterLevel += 15f;
+                }
+                else
+                {
+                    // Jika cerah atau kemarau, kurangi berdasarkan efek upgrade dan cuaca
+                    waterLevel -= UpgradeManager.Instance.GetEvaporationReduction() * weatherMultiplier;
+                }
+            }
+
+            // Batasi nilai air tetap di range 0  sampai 100
+            waterLevel = Mathf.Clamp(waterLevel, 0f, 100f);
 
             UpdatePlotVisual();
         }

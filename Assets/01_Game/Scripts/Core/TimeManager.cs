@@ -27,7 +27,6 @@ public class TimeManager : MonoBehaviour
         {
             currentSecond = 0;
             currentHour++;
-            Debug.Log("Jam Virtual saat ini:" + currentHour + ":00");
 
             // Picu event OnHourChanged agar semua petak tanah tahu jam sudah berganti
             OnHourChanged.Invoke();
@@ -42,17 +41,16 @@ public class TimeManager : MonoBehaviour
                 currentHour = 0;
                 currentDay ++;
 
+                // Panggil acak cuaca saat hari baru dimulai
+                if (WeatherManager.Instance != null) WeatherManager.Instance.RandomizeWeather();
+
                 // Acak harga pasar saat hari baru dimulai!
-                if (MarketManager.Instance != null)
-                {
-                    MarketManager.Instance.UpdateMarketPrices();
-                } 
+                if (MarketManager.Instance != null) MarketManager.Instance.UpdateMarketPrices();
 
                 // Otomatis save progress setiap hari baru dimulai!
-                if (SaveManager.Instance != null)
-                {
-                    SaveManager.Instance.SaveGameProgress();
-                }
+                if (SaveManager.Instance != null) SaveManager.Instance.SaveGameProgress();
+
+
             }
         }
     }

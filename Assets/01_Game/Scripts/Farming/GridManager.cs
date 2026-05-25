@@ -11,6 +11,11 @@ public class GridManager : MonoBehaviour
     void Start()
     {
         GenerateFarmGrid();
+
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.LoadGameProgress();
+        }
     }
 
     void GenerateFarmGrid()

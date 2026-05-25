@@ -40,15 +40,22 @@ public class SaveManager : MonoBehaviour
         }
 
         // Menyimpan status setiap petak lahan di grid
-        // FarmingPlot[] allPlots = FindObjectOfType<FarmingPlot>();
-        // foreach (FarmingPlot plot in allPlots)
-        // {
-        //     // Simpan status lahan 
-        // }
+        FarmingPlot[] allPlots = FindObjectsOfType<FarmingPlot>();
+        foreach (FarmingPlot plot in allPlots)
+        {
+            // Simpan status lahan (Empty = 0, Tilled = 1, Planted = 2) sebagai integer
+            PlayerPrefs.SetInt("PlotState_" + plot.gameObject.name, (int)plot.currentState);
+
+            // Simpan tingkat kelembapan air
+            PlayerPrefs.SetFloat("PlotWater_" + plot.gameObject.name, plot.waterLevel);
+
+            // Simpan apakah sudah terpasang sprinkler IoT (0 = tidak, 1 = ya)
+            PlayerPrefs.SetInt("PlotSprinkler_" + plot.gameObject.name, plot.hasSmartSprinkler ? 1 : 0);
+        }
 
         // Tulis data ke harddisk komputer/perangkat
         PlayerPrefs.Save();
-        Debug.Log("[Save System] Progress pertanian pintar kamu berhasil disimpan otomatis!");
+        Debug.Log("[Save System] Auto-Save Berhasil: Uang, Waktu, Benih, dan Kondisi Lahan Tersimpan!");
     }
     
     // Fungsi utama untuk memuat kembali progres game
@@ -73,6 +80,40 @@ public class SaveManager : MonoBehaviour
             {
                 UpgradeManager.Instance.growthSpeedLevel = PlayerPrefs.GetInt("SavedGrowthLevel");
                 UpgradeManager.Instance.waterEcoLevel = PlayerPrefs.GetInt("SavedWaterLevel");
+            }
+
+            // Muat sisa benih di Inventory
+            if (InventoryManager.Instance != null)
+            {
+                int sisaPadi = PlayerPrefs.GetInt("Inventory_Padi", 5); // Default 5 kalau data baru
+                int sisaGandum = PlayerPrefs.GetInt("Inventory_Gandum", 0);
+
+                // Reset dan set ulang inventory
+                InventoryManager.Instance.AddSeed(MarketManager.Instance.padiData, sisaPadi - InventoryManager.Instance.GetSeedCount(MarketManager.Instance.padiData));
+            }
+
+            // Muat kondisi lahan yang tergelar
+            FarmingPlot[] allPlots = FindObjectsOfType<FarmingPlot>();
+            foreach (FarmingPlot plot in allPlots)
+            {
+                if (PlayerPrefs.HasKey("PlotState_" + plot.gameObject.name))
+                {
+                    // Kembalikan status cangkul/tanam
+                    int savedState = PlayerPrefs.GetInt("PlotState_" + plot.gameObject.name);
+                    plot.currentState = (FarmingPlot.PlotState)savedState;
+
+                    // Kembalikan level air
+                    plot.waterLevel = PlayerPrefs.GetFloat("PlotWater_" + plot.gameObject.name);
+
+                    // Kembalikan alat sprinkler IoT
+                    int savedSprinkler = PlayerPrefs.GetInt("PlotSprinkler_" + plot.gameObject.name);
+                    if (savedSprinkler == 1)
+                    {
+                        plot.EquipSmartSprinkler();
+                    }
+
+                    plot.WaterPlot();
+                }
             }
 
             Debug.Log("[Save System] Progres lama berhasil dimuat! Selamat datang kembali di ladang cerdasmu.");
